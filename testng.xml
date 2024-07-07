@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite parallel="tests" thread-count="5" name="All Test Suite">
+    <listeners>
+        <listener class-name="RESOURCES.Listeners"></listener>
+    </listeners>
+     <test  thread-count="5" parallel="classes" verbose="2" preserve-order="true" name="ChromeDemo">
+        <parameter name="browser" value="chrome" />
+        <classes>
+            <class name="TESTS.CheckoutTests" />
+            <class name="TESTS.EndToEndTest" />
+            <class name="TESTS.InventoryTests" />
+            <class name="TESTS.LoginTests" />
+        </classes>
+    </test>
+    <test thread-count="5" parallel="classes" verbose="2" preserve-order="true" name="FirefoxDemo">
+        <parameter name="browser" value="firefox"/>
+        <classes>
+            <class name="TESTS.CheckoutTests"/>
+            <class name="TESTS.EndToEndTest"/>
+            <class name="TESTS.InventoryTests"/>
+            <class name="TESTS.LoginTests"/>
+        </classes>
+    </test>
+</suite>

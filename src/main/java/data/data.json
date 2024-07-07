@@ -1,0 +1,72 @@
+{
+  "base_url": "https://www.saucedemo.com/",
+  "good_credentials": [
+    {
+      "username": "performance_glitch_user",
+      "password": "secret_sauce"
+    },
+    {
+      "username": "problem_user",
+      "password": "secret_sauce"
+    },
+    {
+      "username": "standard_user",
+      "password": "secret_sauce"
+    },
+    {
+      "username": "visual_user",
+      "password": "secret_sauce"
+    }
+  ],
+  "default_credentials":
+    {
+      "username": "standard_user",
+      "password": "secret_sauce"
+    },
+  "bad_credentials": [
+    {
+      "username": "",
+      "password": "secret_sauce"
+    },
+    {
+      "username": "standard_user",
+      "password": ""
+    },
+    {
+      "username": "username",
+      "password": "password"
+    },
+    {
+      "username": "standard_user",
+      "password": "password"
+    },
+    {
+      "username": "username",
+      "password": "secret_sauce"
+    }
+  ],
+    "bad_checkout_info": [
+    {
+      "firstName": "",
+      "lastName": "Horvat",
+      "postalCode": "test"
+    },
+    {
+      "firstName": "Ivan",
+      "lastName": "",
+      "postalCode": "test"
+    },
+    {
+      "firstName": "Ivan",
+      "lastName": "Horvat",
+      "postalCode": ""
+    }
+  ],
+  "default_checkout_info":
+  {
+    "firstName": "Ivan",
+    "lastName": "Horvat",
+    "postalCode": "32000"
+  }
+}
+
