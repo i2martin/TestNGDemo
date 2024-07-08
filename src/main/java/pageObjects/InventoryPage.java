@@ -34,6 +34,11 @@ public class InventoryPage {
   @FindBy(css = "div[data-test='inventory-item-price']")
   public WebElement inventoryItemPrice;
 
+  @FindBy(css = "button[data-test='add-to-cart']")
+  public WebElement addToCartButton;
+
+  @FindBy(css = "button[data-test='remove']")
+  public WebElement removeFromCartButton;
 
   Select filter;
 

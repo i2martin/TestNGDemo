@@ -22,28 +22,32 @@ public class EndToEndTest extends BaseTest {
 
   LandingPage landingPage;
   InventoryPage inventory;
+  CartPage cart;
+  InventoryItem itemToCart;
+  InventoryItem newItem;
 
   @Test
-  public void verifyOrder() throws IOException {
-
+  public void testLogin() throws IOException {
     Object[][] defaultUser = getDefaultCredentials();
     String username = (String) defaultUser[0][0];
     String password = (String) defaultUser[0][1];
-    int itemIndex = 4;
-    Object[][] checkoutInfo  = getDefaultCheckoutInfo();
-    String sortOption = "hilo";
-
     landingPage.goTo();
     landingPage.logIn(username, password);
     //verify successful login
     Assert.assertEquals(landingPage.successfulLoginUrl, driver.getCurrentUrl());
-
+  }
+  @Test(dependsOnMethods = {"testLogin"})
+  public void testSortItems(){
+    String sortOption = "hilo";
     inventory = new InventoryPage(driver);
     inventory.getItems();
     inventory.sortItems(sortOption);
     //verify that items are sorted from highest to lowest price
     Assert.assertTrue(inventory.itemsSortedByPrice(sortOption));
+  }
 
+  @Test(dependsOnMethods = {"testSortItems"})
+  public void testAddLowestPriceItemToCart(){
     //collect all the items again, after sorting
     List<WebElement> items = inventory.getItemsWithoutStoring();
     List<InventoryItem> newItems = new ArrayList<>();
@@ -52,31 +56,41 @@ public class EndToEndTest extends BaseTest {
       newItems.add(inventory.WebElementToInventoryItem(i));
     }
     //add last item to cart
-    InventoryItem itemToCart = newItems.get(newItems.size()-1);
+    itemToCart = newItems.get(newItems.size()-1);
     inventory.addToCart(items.get(items.size()-1));
     //verify item's added to cart
     Assert.assertEquals(inventory.addToCartButtonText(items.get(items.size()-1)), "Remove", "Item's not added to cart");
     inventory.goToCart();
-    CartPage cart = new CartPage(driver);
     cart.getItems();
     //verify that correct item's in the cart
     Assert.assertTrue(cart.compareProducts(itemToCart), "Added item and item in cart do not match");
+  }
+
+  @Test(dependsOnMethods = {"testAddLowestPriceItemToCart"})
+  public void testAddSpecificIndexItemToCart(){
+    int itemIndex = 4;
     //return to inventory
     driver.navigate().back();
     //open specific item in inventory
     inventory.getProductByProductIndex(itemIndex).click();
-    InventoryItem newItem = inventory.collectItemInformationFromItemPage();
+    newItem = inventory.collectItemInformationFromItemPage();
     //add item to cart
-    driver.findElement(By.cssSelector("button[data-test='add-to-cart']")).click();
+    inventory.addToCartButton.click();
     //verify that the product is added to cart
-    Assert.assertEquals(driver.findElement(By.cssSelector("button[data-test='remove']")).getText(), "Remove", "Item's not correctly updating");
+    Assert.assertEquals(inventory.removeFromCartButton.getText(), "Remove", "Item's not correctly updating");
     inventory.goToCart();
     cart.getItems();
     //verify new product's in the cart as well
     Assert.assertTrue(cart.compareProducts(newItem), "Added item and item in cart do not match");
+
+  }
+  @Test(dependsOnMethods = {"testAddSpecificIndexItemToCart"})
+  public void verifyCheckout() throws IOException {
+
+    Object[][] checkoutInfo = getDefaultCheckoutInfo();
     cart.goToCheckout();
     CheckoutPage checkout = new CheckoutPage(driver);
-    checkout.fillInformation((String) checkoutInfo[0][0], (String) checkoutInfo[0][1] , (String) checkoutInfo[0][2]);
+    checkout.fillInformation((String) checkoutInfo[0][0], (String) checkoutInfo[0][1], (String) checkoutInfo[0][2]);
     checkout.cont.click();
 
     //verify information's filled and accepted
@@ -93,13 +107,15 @@ public class EndToEndTest extends BaseTest {
     checkout.finish.click();
     //verify that order's complete
     Assert.assertEquals(checkout.getCompleteOrderText(), "Thank you for your order!", "Order confirmation not present!");
+  }
 
+  @Test(dependsOnMethods = {"verifyCheckout"})
+  public void testLogOut(){
     landingPage.sidebarBtn.click();
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
     wait.until(ExpectedConditions.visibilityOf(landingPage.logOut));
     landingPage.logOut.click();
-
     //verify successful logout
     Assert.assertEquals(LandingPage.baseUrl, driver.getCurrentUrl());
   }
@@ -109,6 +125,7 @@ public class EndToEndTest extends BaseTest {
   public void initialize(String browser) throws IOException {
     driver = initializeDriver(browser);
     landingPage = new LandingPage(driver);
+    cart = new CartPage(driver);
   }
 
   @AfterTest
